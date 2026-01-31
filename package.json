@@ -1,0 +1,35 @@
+{
+  "name": "openads",
+  "version": "1.0.0",
+  "description": "OpenAds is a library for displaying ads based on page context or user activity.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "ads",
+    "contextual-ads",
+    "privacy",
+    "nodejs",
+    "advertising",
+    "bidding",
+    "campaign"
+  ],
+  "license": "MIT",
+  "author": "Fitri HY <fhy@fhylabs.com>",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FhyLabs/openads.git"
+  },
+  "homepage": "https://github.com/FhyLabs/openads#readme",
+  "bugs": {
+    "url": "https://github.com/FhyLabs/openads/issues"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  }
+}
