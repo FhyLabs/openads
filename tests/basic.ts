@@ -2,7 +2,7 @@ import { Ad, Context, selectAd, selectAds, renderHtml, Campaign } from "../index
 
 /**
  * =========================
- * DATA IKLAN (10 IKLAN)
+ * ADVERTISEMENT DATA
  * =========================
  */
 const ads: Ad[] = [
@@ -24,6 +24,7 @@ const ads: Ad[] = [
     title: "Cloud VPS Global",
     description: "Server cloud cepat semua negara",
     url: "https://cloudvps.com",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["cloud", "vps", "server"],
     bid: 2800,
     device: "all",
@@ -34,6 +35,7 @@ const ads: Ad[] = [
     title: "Belajar Coding dari HP",
     description: "Aplikasi mobile untuk belajar programming",
     url: "https://mobilecoding.app",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["coding", "mobile", "programming"],
     bid: 3000,
     device: "mobile",
@@ -45,6 +47,7 @@ const ads: Ad[] = [
     title: "Kursus React Online",
     description: "Belajar React dan frontend modern",
     url: "https://reactcourse.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["react", "frontend", "javascript"],
     bid: 2500,
     device: "all",
@@ -56,6 +59,7 @@ const ads: Ad[] = [
     title: "Template Website Developer",
     description: "Template siap pakai untuk portofolio",
     url: "https://template.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["template", "website", "developer"],
     bid: 2000,
     device: "all",
@@ -66,6 +70,7 @@ const ads: Ad[] = [
     title: "Bootcamp Backend Node.js",
     description: "Belajar API, database, dan backend",
     url: "https://bootcamp.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["backend", "node", "api", "developer"],
     bid: 3000,
     device: "all",
@@ -77,6 +82,7 @@ const ads: Ad[] = [
     title: "Tools Produktivitas Developer",
     description: "Coding lebih cepat dan rapi",
     url: "https://devtools.app",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["tools", "developer", "productivity"],
     bid: 1800,
     device: "all",
@@ -87,6 +93,7 @@ const ads: Ad[] = [
     title: "Kursus TypeScript Intensif",
     description: "TypeScript untuk project skala besar",
     url: "https://typescript.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["typescript", "javascript", "developer"],
     bid: 2400,
     device: "all",
@@ -98,6 +105,7 @@ const ads: Ad[] = [
     title: "Cloud Server Murah Indonesia",
     description: "Server cloud cepat untuk web app",
     url: "https://cloudid.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["cloud", "vps", "server", "hosting"],
     bid: 2600,
     device: "all",
@@ -110,6 +118,7 @@ const ads: Ad[] = [
     title: "Buku Backend Architecture",
     description: "Panduan membangun backend scalable",
     url: "https://backendbook.dev",
+    image: "https://img.example.com/hosting.jpg",
     keywords: ["backend", "architecture", "server"],
     bid: 2000,
     device: "all",
@@ -131,7 +140,7 @@ const campaign: Campaign = {
 
 /**
  * =========================
- * CONTEXTS (SEMUA HALAMAN)
+ * CONTEXT (ALL PAGES)
  * =========================
  */
 const contexts: { label: string, context: Context, options?: any }[] = [
@@ -141,7 +150,7 @@ const contexts: { label: string, context: Context, options?: any }[] = [
       type: "article",
       title: "Belajar Backend Node.js",
       content: "Tutorial backend Node.js untuk developer. Membahas server, hosting, dan cloud infrastructure.",
-      category: "backend"
+      category: ["backend","frontend"]
     },
     options: { device: "desktop", country: "ID" }
   },

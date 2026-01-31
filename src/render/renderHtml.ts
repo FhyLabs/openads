@@ -1,7 +1,11 @@
-import { Ad } from "../types/Ad"
-import { renderTextAd } from "./renderTextAd"
-import { renderNativeAd } from "./renderNativeAd"
+import { Ad } from "../types/Ad";
+import { renderTextAd } from "./renderTextAd";
+import { renderNativeAd } from "./renderNativeAd";
 
 export function renderHtml(ad: Ad): string {
-  return ad.image ? renderNativeAd(ad) : renderTextAd(ad)
+  if (ad.image && ad.image.trim() !== "") {
+    return renderNativeAd(ad);
+  }
+
+  return renderTextAd(ad);
 }

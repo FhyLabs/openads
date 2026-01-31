@@ -4,31 +4,33 @@
 
 **Key Features**:
 
-* Supports various page types: `article`, `search`, `category`, `tag`, `home`
+* Supports multiple page types: `article`, `search`, `category`, `tag`, `home`
 * Ad filters: **device**, **country**, **hour**, **category**
-* Auction-based scoring to show the **most relevant and profitable ads**
+* Ad selection uses **auction-based scoring** to show the **most relevant and profitable ads**
+* Supports **multi-category** in context and ads
+* `renderHtml` automatically chooses **text ad** or **native ad** based on `ad.image`
 
 ---
 
-## Ad Bidding & Scoring Flow
+## Bidding & Ad Scoring Flow
 
 ### Ad Score (Auction Score)
 
-Each ad receives a **score** based on the following factors:
+Each ad gets a **score** based on several factors:
 
-| Factor                        | Description                                                                  |
-| ----------------------------- | ---------------------------------------------------------------------------- |
-| **Bid / Offer Price**         | Higher bid → higher chance to win                                            |
-| **Keyword Relevance**         | Ad keywords compared to page context (`title + content`)                     |
-| **Category (optional)**       | Matching page category → score increases                                     |
-| **Device, Geo, Hour Filters** | **Filters**, not scores. Ads that don't match are **removed** before scoring |
+| Factor                       | Description                                                               |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| **Bid / Offer Price**        | Higher bid → higher chance of winning                                     |
+| **Keyword Relevance**        | Ad keywords compared to page context (`title + content`)                  |
+| **Category (optional)**      | Matches page category → increases score                                   |
+| **Device, Geo, Hour Filter** | **Filter**, not a score. Ads that don't match are **immediately removed** |
 
 ### Ad Ranking
 
-* All ads that pass the filters are sorted by **score: highest → lowest**
-* Ads with the highest relevance & bid → displayed **at the top**
-* `selectAd()` function → returns **one winning ad**
-* `selectAds(context, ads, options, limit)` → returns **multiple top ads** (multi-ad)
+* All ads that pass the filters are sorted from **highest → lowest score**
+* Ads with the highest relevance and bid → displayed **at the top**
+* `selectAd()` → displays **one winning ad**
+* `selectAds(context, ads, options, limit)` → displays **top multiple ads** (multi-ad)
 
 #### Example Score
 
@@ -44,21 +46,21 @@ Each ad receives a **score** based on the following factors:
 ad-1 → ad-2 → ad-3
 ```
 
-> Note: Bid + keyword relevance determine the score. Device/geo/hour filters eliminate irrelevant ads before scoring.
+> Note: Bid + keyword relevance determine the score. Device/geo/hour filters eliminate irrelevant ads **before scoring**.
 
 ---
 
 ## Campaign & Budget Flow
 
-Every ad in a campaign **reduces the campaign budget** when displayed.
+Each ad in a campaign reduces the budget when displayed.
 
-| Concept / Factor              | Description                                                        |
-| ----------------------------- | ------------------------------------------------------------------ |
-| **Campaign Budget**           | Total fund allocated for the campaign (e.g., 100,000)              |
-| **Bid / Ad Price**            | When an ad is shown, the bid **is deducted from the budget**       |
-| **Device, Geo, Hour Filters** | Ads that do not match are **removed**, budget is not reduced       |
-| **Ad Priority**               | Ads with higher bid & higher keyword relevance are displayed first |
-| **Stop When Budget Runs Out** | If remaining budget < ad bid → ad is not displayed                 |
+| Concept / Factor              | Description                                                              |
+| ----------------------------- | ------------------------------------------------------------------------ |
+| **Campaign Budget**           | Total funds allocated for the campaign (e.g., 100,000)                   |
+| **Ad Bid / Price**            | When an ad is displayed, the bid **is subtracted from the budget**       |
+| **Device, Geo, Hour Filter**  | Ads that don't match are immediately **removed**, budget is not deducted |
+| **Ad Priority**               | Ads with higher bid & keyword relevance are displayed first              |
+| **Stop When Budget Runs Out** | If remaining budget < ad bid → ad is not displayed                       |
 
 #### Example Budget
 
@@ -77,8 +79,8 @@ ad-1 → ad-2 → ad-3
 > Notes:
 >
 > * Ads are displayed only if **campaign budget ≥ ad bid**
-> * Irrelevant ads (by device/geo/hour filters) **do not reduce budget**
-> * Multi-ad campaigns → each ad displayed **reduces the budget separately**
+> * Irrelevant ads (device/geo/hour filters) **do not reduce the budget**
+> * Multi-ad campaigns → each displayed ad **reduces the budget separately**
 
 ---
 
@@ -90,48 +92,64 @@ ad-1 → ad-2 → ad-3
 npm i @fhylabs/openads
 ```
 
-### Importing
+### Import Library
 
 ```js
 // CommonJS
-const { Ad, Context, selectAd, selectAds, renderHtml } = require("@fhylabs/openads");
+const { Ad, Context, selectAd, selectAds, renderHtml, Campaign } = require("@fhylabs/openads");
 
 // ES Modules
-import { Ad, Context, selectAd, selectAds, renderHtml } from "@fhylabs/openads"
+import { Ad, Context, selectAd, selectAds, renderHtml, Campaign } from "@fhylabs/openads"
 ```
 
-### Sample Ads Data
+---
 
-```js
+### Example Ad Data
+
+```ts
 const ads: Ad[] = [
   {
     id: "ad-1",
     title: "Ultra Fast Laptop",
-    description: "Laptop with high performance",
+    description: "High-performance laptop",
     url: "https://example.com",
     image: "https://img.example.com/laptop.jpg",
     keywords: ["laptop", "gaming", "developer", "high performance"],
     bid: 3500,
-    device: "desktop",                      // all | desktop | mobile
-    countries: ["ID", "EN"],                // [] → all countries
-    hours: [9,10,11,12,13,14,15,16,17],     // [] → all hours
-    category: ["hardware", "programming"]   // [] → all categories
-  }
-  // other ads ...
+    device: "desktop",
+    countries: ["ID", "EN"],
+    hours: [9,10,11,12,13,14,15,16,17],
+    category: ["hardware", "programming"]
+  },
+  {
+    id: "ad-2",
+    title: "Global Cloud VPS",
+    description: "Fast cloud server worldwide",
+    url: "https://cloudvps.com",
+    bid: 2800,
+    device: "all",
+    countries: [],
+    hours: [],
+    category: ["backend"],
+    keywords: ["cloud","vps","server"]
+  },
+  // Add other ads (total 10) ...
 ]
 ```
 
-### Sample Page Contexts
+---
 
-```js
+### Example Page Context (Supports Multi-Category)
+
+```ts
 const contexts: { label: string, context: Context, options?: any }[] = [
   {
     label: "ARTICLE PAGE",
     context: {
       type: "article",
-      title: "Learn Node.js Backend",
-      content: "Node.js backend tutorial for developers. Covers server, hosting, and cloud infrastructure.",
-      category: "backend"
+      title: "Learn Backend & Frontend Node.js",
+      content: "Complete tutorial on Node.js backend and frontend",
+      category: ["backend","frontend"] // Can have multiple
     },
     options: { device: "desktop", country: "ID" }
   },
@@ -148,7 +166,7 @@ const contexts: { label: string, context: Context, options?: any }[] = [
     context: { 
         type: "category", 
         content: "backend", 
-        category: "backend" 
+        category: ["backend","frontend"] 
     }
   },
   {
@@ -159,7 +177,7 @@ const contexts: { label: string, context: Context, options?: any }[] = [
     }
   },
   {
-    label: "HOMEPAGE",
+    label: "HOME PAGE",
     context: { 
         type: "home", 
         content: "javascript typescript react developer tools" 
@@ -168,21 +186,32 @@ const contexts: { label: string, context: Context, options?: any }[] = [
 ]
 ```
 
-### Sample Campaign
+---
 
+### Example Campaign
+
+```ts
+const campaigns: Campaign[] = [
+  {
+    id: "camp-1",
+    ads: adsCampaign1,
+    budget: 100000
+  },
+  {
+    id: "camp-2",
+    ads: adsCampaign2,
+    budget: 50000
+  }
+]
 ```
-const campaign: Campaign = {
-  id: "camp-1",
-  ads,
-  budget: 100000
-}
-```
+
+---
 
 ### Displaying Ads
 
 #### Single Ad
 
-```js
+```ts
 for (const { label, context, options } of contexts) {
   const ad = selectAd(context, ads, options)
   console.log(`\n===== ${label} =====`)
@@ -199,9 +228,9 @@ for (const { label, context, options } of contexts) {
 }
 ```
 
-#### Multiple Ads
+#### Multi Ads
 
-```js
+```ts
 for (const { label, context, options } of contexts) {
   const topAds: Ad[] = selectAds(context, ads, options, 3)
   console.log(`\n===== ${label} =====`)
@@ -223,7 +252,7 @@ for (const { label, context, options } of contexts) {
 
 #### Campaign Multi Ads
 
-```js
+```ts
 const { context: articleContext, options: articleOptions } = contexts[0]
 const topAdsFromCampaign = selectAds(articleContext, campaign.ads, articleOptions, 3)
 console.log("\n===== CAMPAIGN: Multi Ads =====")
@@ -242,7 +271,7 @@ else {
 
 #### Campaign Single Ad
 
-```js
+```ts
 const adFromCampaign = selectAd(articleContext, campaign.ads, articleOptions)
 console.log("\n===== CAMPAIGN: Single Ad =====")
 if (adFromCampaign) {

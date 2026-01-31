@@ -11,5 +11,5 @@ export interface Ad {
   device?: "all" | "mobile" | "desktop"
   countries?: string[]
   hours?: number[]
-  category?: string[]
+  category?: string | string[]
 }

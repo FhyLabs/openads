@@ -7,6 +7,8 @@
 * Mendukung berbagai tipe halaman: `article`, `search`, `category`, `tag`, `home`
 * Filter iklan: **device**, **negara**, **jam**, **kategori**
 * Penentuan iklan menggunakan **auction-based scoring** untuk menampilkan iklan **paling relevan dan menguntungkan**
+* Support **multi-category** di context dan ads
+* `renderHtml` otomatis pilih **text ad** atau **native ad** berdasarkan `ad.image`
 
 ---
 
@@ -94,15 +96,17 @@ npm i @fhylabs/openads
 
 ```js
 // CommonJS
-const { Ad, Context, selectAd, selectAds, renderHtml } = require("@fhylabs/openads");
+const { Ad, Context, selectAd, selectAds, renderHtml, Campaign } = require("@fhylabs/openads");
 
 // ES Modules
-import { Ad, Context, selectAd, selectAds, renderHtml } from "@fhylabs/openads"
+import { Ad, Context, selectAd, selectAds, renderHtml, Campaign } from "@fhylabs/openads"
 ```
 
-### Contoh Data Iklan
+---
 
-```js
+### Contoh Data Iklan (Ad)
+
+```ts
 const ads: Ad[] = [
   {
     id: "ad-1",
@@ -112,26 +116,40 @@ const ads: Ad[] = [
     image: "https://img.example.com/laptop.jpg",
     keywords: ["laptop", "gaming", "developer", "high performance"],
     bid: 3500,
-    device: "desktop",                      // all | desktop | mobile
-    countries: ["ID", "EN"],                // [] → semua negara
-    hours: [9,10,11,12,13,14,15,16,17],     // [] → semua jam
-    category: ["hardware", "programming"]   // [] → semua kategori
-  }
-  // Iklan lainnya ...
+    device: "desktop",
+    countries: ["ID", "EN"],
+    hours: [9,10,11,12,13,14,15,16,17],
+    category: ["hardware", "programming"]
+  },
+  {
+    id: "ad-2",
+    title: "Cloud VPS Global",
+    description: "Server cloud cepat semua negara",
+    url: "https://cloudvps.com",
+    bid: 2800,
+    device: "all",
+    countries: [],
+    hours: [],
+    category: ["backend"],
+    keywords: ["cloud","vps","server"]
+  },
+  // Tambahkan iklan lainnya (total 10) ...
 ]
 ```
 
-### Contoh Context Halaman
+---
 
-```js
+### Contoh Context Halaman (Support Multi-Category)
+
+```ts
 const contexts: { label: string, context: Context, options?: any }[] = [
   {
     label: "HALAMAN ARTIKEL",
     context: {
       type: "article",
-      title: "Belajar Backend Node.js",
-      content: "Tutorial backend Node.js untuk developer. Membahas server, hosting, dan cloud infrastructure.",
-      category: "backend"
+      title: "Belajar Backend & Frontend Node.js",
+      content: "Tutorial lengkap backend dan frontend Node.js",
+      category: ["backend","frontend"]   // Bisa lebih dari 1
     },
     options: { device: "desktop", country: "ID" }
   },
@@ -148,7 +166,7 @@ const contexts: { label: string, context: Context, options?: any }[] = [
     context: { 
         type: "category", 
         content: "backend", 
-        category: "backend" 
+        category: ["backend","frontend"] 
     }
   },
   {
@@ -168,21 +186,32 @@ const contexts: { label: string, context: Context, options?: any }[] = [
 ]
 ```
 
+---
+
 ### Contoh Campaign
 
+```ts
+const campaigns: Campaign[] = [
+  {
+    id: "camp-1",
+    ads: adsCampaign1,
+    budget: 100000
+  },
+  {
+    id: "camp-2",
+    ads: adsCampaign2,
+    budget: 50000
+  }
+]
 ```
-const campaign: Campaign = {
-  id: "camp-1",
-  ads,
-  budget: 100000
-}
-```
+
+---
 
 ### Menampilkan Iklan
 
 #### Single Ad
 
-```js
+```ts
 for (const { label, context, options } of contexts) {
   const ad = selectAd(context, ads, options)
   console.log(`\n===== ${label} =====`)
@@ -201,7 +230,7 @@ for (const { label, context, options } of contexts) {
 
 #### Multi Ads
 
-```js
+```ts
 for (const { label, context, options } of contexts) {
   const topAds: Ad[] = selectAds(context, ads, options, 3)
   console.log(`\n===== ${label} =====`)
@@ -223,7 +252,7 @@ for (const { label, context, options } of contexts) {
 
 #### Campaign Multi Ads
 
-```js
+```ts
 const { context: articleContext, options: articleOptions } = contexts[0]
 const topAdsFromCampaign = selectAds(articleContext, campaign.ads, articleOptions, 3)
 console.log("\n===== CAMPAIGN: Multi Ads =====")
@@ -242,7 +271,7 @@ else {
 
 #### Campaign Single Ad
 
-```js
+```ts
 const adFromCampaign = selectAd(articleContext, campaign.ads, articleOptions)
 console.log("\n===== CAMPAIGN: Single Ad =====")
 if (adFromCampaign) {
