@@ -168,6 +168,16 @@ const contexts: { label: string, context: Context, options?: any }[] = [
 ]
 ```
 
+### Sample Campaign
+
+```
+const campaign: Campaign = {
+  id: "camp-1",
+  ads,
+  budget: 100000
+}
+```
+
 ### Displaying Ads
 
 #### Single Ad

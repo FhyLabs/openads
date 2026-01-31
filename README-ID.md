@@ -168,6 +168,16 @@ const contexts: { label: string, context: Context, options?: any }[] = [
 ]
 ```
 
+### Contoh Campaign
+
+```
+const campaign: Campaign = {
+  id: "camp-1",
+  ads,
+  budget: 100000
+}
+```
+
 ### Menampilkan Iklan
 
 #### Single Ad
